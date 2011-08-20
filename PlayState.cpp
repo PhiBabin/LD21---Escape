@@ -31,6 +31,8 @@ PlayState::PlayState(GameEngine* theGameEngine): m_playerOne(0),m_map(0)
 
     m_mapEntity=m_map->GetMapEntity();
     m_playerOne->SetMapObject(m_mapEntity);
+
+    m_map->GenerateMap(300,20,6,10,3,6);
 }
 /**
     Initialisation des éléments du jeu
@@ -158,7 +160,7 @@ void PlayState::movePlayer(Player &player){
     else player.SetVely(0);
 
     //! Ouch!
-    if(kill)player.Degat(200);
+    if(kill)player.SetPosition(m_map->m_spawnLocationOne);
 }
 
 /**

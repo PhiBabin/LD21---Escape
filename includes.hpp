@@ -30,6 +30,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define BOUGE true
 #define IMMOBILE false
 
+#define VIDE 0
+#define SPAWN 1
+#define BLOCK 2
+#define PRINCESS 3
+#define KNIGHT 4
+#define KILL 5
+
+
 #include <iostream>
 #include <sstream>
 #include <fstream>

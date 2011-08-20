@@ -61,13 +61,8 @@ Type MapTile::Tile(float x, float y){
  }
 
 void MapTile::Draw(){
-//    sf::Texture fun=m_map.GetTexture ().CopyToImage ();
-//    int v=110,b=0;
-//    cout<<"FUCKFUCKFUCKFUCK Color r="<<(int)fun.GetPixel(v,b).r<<"Color g="<<(int)fun.GetPixel(v,b).g<<"Color b="<<(int)fun.GetPixel(v,b).b<<endl;
-
-    cout<<"FPS="<</*1.f/(m_app->GetFrameTime())*1000<<*/"Joueur 1 x="<<m_playerOne->GetPosition().x<<" y="<<m_playerOne->GetPosition().y<<" vely="<<m_playerOne->GetVely()<<" velx="<<m_playerOne->GetVelx()<<endl;
-    //! On affiche les tiles du background
-    m_app->Draw(sf::Sprite(m_background.GetTexture()));
+    cout<<"FPS="<</*1.f/(m_app->GetFrameTime())*1000<<*/"Joueur 1 x="<<m_playerOne->GetPosition().x/GameConfig::g_config["tilewidth"]
+    <<" y="<<m_playerOne->GetPosition().y<<" vely="<<m_playerOne->GetVely()<<" velx="<<m_playerOne->GetVelx()<<endl;
     //! On affiche les tiles du foreground
     for(int y=0;y<m_height;y++){
         for(int x=0;x<m_width;x++){
@@ -76,9 +71,6 @@ void MapTile::Draw(){
                 }
         }
     }
-//    m_map.Display();
-//    m_app->Draw(sf::Sprite(m_map.GetTexture()));
-
     //! On affiche le personnage et ces éléments
     m_app->Draw(*m_playerOne);
     m_playerOne->Drawing(m_app);
@@ -104,6 +96,58 @@ vector<Type> & MapTile::operator [] (int X){
         exit(0);
         return 0;
  }
+void MapTile::GenerateMap(int wmap,int hmap, int pmin, int pmax, int dmin, int dmax){
+	m_tileSet.erase(m_tileSet.begin(),m_tileSet.end());
+    m_width=wmap;
+    m_height=hmap;
+    //! On vide la map
+    vector<Type> emptyVec;
+    emptyVec.resize(hmap);
+    m_tileSet.resize(wmap,emptyVec);
+    for(int y=0;y<hmap;y++){
+        for(int x=0;x<wmap;x++){
+            (m_tileSet.at(x)).at(y)=m_typeList[VIDE];
+            (m_tileSet.at(x)).at(y).tile.SetPosition(x*GameConfig::g_config["tilewidth"],y*GameConfig::g_config["tileheight"]);
+            (m_tileSet.at(x)).at(y).tile.SetSubRect(m_typeList[VIDE].zoneRect);
+        }
+    }
+    //! On met le premier palier
+    int firstP=rand() % (hmap/2) + 3;
+    int longerP=rand() % pmax + pmin;
+    for(int x=0;x<longerP;x++){
+        (m_tileSet.at(x)).at(firstP)=m_typeList[KNIGHT];
+        (m_tileSet.at(x)).at(firstP).tile.SetPosition(x*GameConfig::g_config["tilewidth"],firstP*GameConfig::g_config["tileheight"]);
+        (m_tileSet.at(x)).at(firstP).tile.SetSubRect(m_typeList[KNIGHT].zoneRect);
+    }
+    //! On met le spawn
+    sf::Vector2f spawnLocationOne(3*GameConfig::g_config["tilewidth"] ,(firstP-1)*GameConfig::g_config["tileheight"]-GameConfig::g_config["playercollheight"]);
+    m_spawnLocationOne=spawnLocationOne;
+    m_playerOne->SetPosition(m_spawnLocationOne);
+
+    int cursor= longerP+3;
+    int hight= firstP+rand() % 3 - 3;
+    while(cursor+longerP<wmap){
+        for(int x=cursor;x<cursor+longerP;x++){
+            (m_tileSet.at(x)).at(hight)=m_typeList[BLOCK];
+            (m_tileSet.at(x)).at(hight).tile.SetPosition(x*GameConfig::g_config["tilewidth"],hight*GameConfig::g_config["tileheight"]);
+            (m_tileSet.at(x)).at(hight).tile.SetSubRect(m_typeList[BLOCK].zoneRect);
+        }
+        cursor+=longerP+rand() % dmax + dmin;
+        if(hight+5>wmap)hight-=rand() % 4 +1;
+        if(hight-5<0)hight+=rand() % 4 +1;
+        else hight+=rand() % 4 -5;
+        longerP=rand() % pmax + pmin;
+    }
+
+    //! On met le sol mortel
+    for(int x=0;x<wmap;x++){
+        (m_tileSet.at(x)).at(hmap-1)=m_typeList[KILL];
+        (m_tileSet.at(x)).at(hmap-1).tile.SetPosition(x*GameConfig::g_config["tilewidth"],(hmap-1)*GameConfig::g_config["tileheight"]);
+        (m_tileSet.at(x)).at(hmap-1).tile.SetSubRect(m_typeList[KILL].zoneRect);
+    }
+
+
+}
 void MapTile::LoadMap(){
     map<string,string> levelConfig;
 	int typeSpawn1,typeSpawn2;
@@ -131,11 +175,6 @@ void MapTile::LoadMap(){
 
     //! Initiation des images temporaire
     sf::Texture tilesetImg,backImg ,backbackImg ,image_schemaImg;
-    tilesetImg.LoadFromFile(levelConfig["mappath"]);
-    backImg.LoadFromFile(levelConfig["backpath"]);
-///    backbackImg.LoadFromFile(levelConfig["backbackpath"]);
-///    sf::Sprite backback(backbackImg);
-///    backback.SetPosition(backbackCoor);
     //! On supprime les vectors
 	m_typeList.erase(m_typeList.begin(),m_typeList.end());
 	m_tileSet.erase(m_tileSet.begin(),m_tileSet.end());
@@ -154,9 +193,6 @@ void MapTile::LoadMap(){
         int itemY2 =atoi(pElem->Attribute("y2"));
         int itemX3 =atoi(pElem->Attribute("x3"));
         int itemY3 =atoi(pElem->Attribute("y3"));
-//	    m_mapItems.push_back(new GameItems(GameConfig::g_imgManag["item"].img,GameConfig::g_imgManag["item"].nbrCollum,GameConfig::g_imgManag["item"].nbrLine,0,0,0,0,false,itemX,itemY,itemX2,itemY2,itemX3,itemY3));
-//	    m_mapItems.back()->SetPosition((itemX+0.5)*GameConfig::g_config["tilewidth"],itemY*GameConfig::g_config["tileheight"]);
-//	    m_mapItems.back()->setDelay(0.2);
     }
 
     //! On charge les différentes tiles
@@ -181,12 +217,18 @@ void MapTile::LoadMap(){
         if(atoi(pElem->Attribute("solid"))==1)newTile.solid=true;
         else newTile.solid=false;
 
+        if(atoi(pElem->Attribute("princess"))==1)newTile.princess=true;
+        else newTile.princess=false;
+
+        if(atoi(pElem->Attribute("fall"))==1)newTile.fall=true;
+        else newTile.fall=false;
+        newTile.touch=false;
+
         m_typeList.insert(m_typeList.end(),newTile);
     }
 
 	//! Charge le niveau
 	int theTile;
-    m_map.Create(m_width*GameConfig::g_config["tilewidth"],m_height*GameConfig::g_config["tileheight"]);
     for(int it=0;it<m_width;it++){
         vector<Type> tileList2;
         m_tileSet.insert(m_tileSet.end(),tileList2);
@@ -199,19 +241,12 @@ void MapTile::LoadMap(){
                 m_playerOne->SetPosition(m_spawnLocationOne);
             }
             Type theNewTile= m_typeList[theTile];
-            //theNewTile.tile.SetTexture(m_ImgTypeTile);
             theNewTile.tile.SetPosition(it*GameConfig::g_config["tilewidth"],it2*GameConfig::g_config["tileheight"]);
             theNewTile.tile.SetSubRect(m_typeList[theTile].zoneRect);
             m_tileSet[it].insert( m_tileSet[it].end(),theNewTile);
-
-            if(theNewTile.visible)m_map.Draw(theNewTile.tile);
         }
     }
-    m_map.Display();
-    //exit(0);
     //! Chargement du background
-    m_background.Create(m_width*GameConfig::g_config["tilewidth"],m_height*GameConfig::g_config["tileheight"]);
-//!    m_background.Draw(backback);
     for(int it=0;it<m_width;it++){
         for(int it2=0;it2<m_height;it2++){
             theTile=FindType(backImg.CopyToImage().GetPixel(it, it2));
@@ -219,11 +254,8 @@ void MapTile::LoadMap(){
             theNewTile.tile.SetPosition(it*GameConfig::g_config["tilewidth"],it2*GameConfig::g_config["tileheight"]);
             //theNewTile.tile.SetTexture(m_ImgTypeTile);
             theNewTile.tile.SetSubRect(m_typeList[theTile].zoneRect);
-            if(theNewTile.visible)m_background.Draw(theNewTile.tile);
         }
     }
-    m_background.Display();
-    backImg.Create(0,0);
 }
 MapTile::~MapTile(){
     for(unsigned int i=0;i<m_mapEntity.size();i++){

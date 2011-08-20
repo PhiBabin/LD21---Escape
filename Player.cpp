@@ -107,7 +107,7 @@ void Player::Turn(bool left, bool right){
     for(int y=minHeight;y<=maxHeight;y++){
         for(int x=minWidth;x<=maxWidth;x++){
             if(!(x>=(*m_map)->m_width or y>=(*m_map)->m_height)){
-                if((*m_map)->Tile(x,y).solid){
+                if((*m_map)->Tile(x,y).solid && !((*m_map)->Tile(x,y).touch && (*m_map)->Tile(x,y).tile.GetColor().a==0)){
                     sf::FloatRect  theTile(x*GameConfig::g_config["tilewidth"],y*GameConfig::g_config["tileheight"],GameConfig::g_config["tilewidth"],GameConfig::g_config["tileheight"]);
                     if(playerRect.Intersects(theTile)||theTile.Intersects(playerRect)){
                         CollisionVertical=true;
@@ -198,33 +198,6 @@ bool Player::GetBottomCollision() const{
 void Player::UnlockJump(){
     m_jumpLock=false;
     m_vely=0;
-}
-void Player::Shoot(){
-//    if(m_lastShot.GetElapsedTime()/1000.f>0.4){
-//        float velx=0,vely=0;
-//        if(m_lookUp==HAUT ){
-//            if(m_moving==BOUGE){
-//                vely=-162;
-//                velx=162;
-//                if(m_direction==GAUCHE){
-//                    velx=-162;
-//                }
-//            }
-//            else{
-//                vely=-10;
-//            }
-//        }
-//        else{
-//            velx=-10;
-//            if(m_direction==DROITE)velx=10;
-//        }
-//
-//        m_listObject->push_back(new GameBullet(GameConfig::GameConfig::g_imgManag["bullet"].img,GameConfig::GameConfig::g_imgManag["bullet"].nbrCollum,GameConfig::GameConfig::g_imgManag["bullet"].nbrLine,10,true,this,velx,vely));
-//        m_listObject->back()->SetPosition(GetPosition());
-//        m_listObject->back()->setDelay(0.1);
-//        m_listObject->back()->SetColor(sf::Color::Red);
-//        m_lastShot.Reset();
-//    }
 }
 
 void Player::Drawing(sf::RenderWindow* app){

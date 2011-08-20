@@ -18,7 +18,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define MAP_HPP_INCLUDED
 struct Type{
     //! Propriétés
-	bool visible, solid, kill;
+	bool visible, solid, kill, princess,fall,touch;
 	//! La couleur correspondante
 	sf::Color   colorPix;
 	//! Le rectangle visible du tileset
@@ -28,6 +28,7 @@ class MapTile{
 	public:
         MapTile();
         MapTile(sf::RenderWindow *App,Player *playerOne);
+		void GenerateMap(int wmap,int hmap, int pmin, int pmax, int dmin, int dmax);
 		void LoadMap();
 		void Draw();
         vector<Type> & operator [] (int X);
@@ -41,7 +42,6 @@ class MapTile{
         //! Public variable
 		int m_width, m_height;
 		sf::Vector2f m_spawnLocationOne;
-		sf::Vector2f m_spawnLocationTwo;
 	private:
         sf::RenderWindow *m_app;
 		sf::Texture m_ImgTypeTile;

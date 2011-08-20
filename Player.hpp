@@ -38,8 +38,6 @@ class Player:public ImgAnim{
     //! Saut
         void Jump();
         void UnlockJump();
-    //! Tire
-        void Shoot();
     //! Déplacement
         void Turn(bool left, bool right);
         void TurnUp(bool up);
