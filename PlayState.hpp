@@ -33,8 +33,11 @@ class PlayState: public GameState {
     private:
         Player *m_playerOne;
         MapTile *m_map;
-        bool m_start;
+        sf::View m_camera;
+        bool m_start, m_draMovX, m_draMovY;
         int m_scoreP,m_scoreK;
+        sf::Sprite m_dragon;
+        float m_dMovX, m_dMovY;
 
         vector<GameEntity*> *m_mapEntity;
         GameEngine *m_gameEngine;

@@ -28,7 +28,7 @@ class MapTile{
 	public:
         MapTile();
         MapTile(sf::RenderWindow *App,Player *playerOne);
-		void GenerateMap(int rate,int wmap,int hmap, int pmin, int pmax, int dmin, int dmax);
+		void GenerateMap(int rate,int wmap,int hmap, int pmin, int pmax, int dmin, int dmax,int nbrTower);
 		void LoadMap();
 		void Draw();
         vector<Type> & operator [] (int X);

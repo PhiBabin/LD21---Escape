@@ -22,9 +22,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
     Construction des éléments du jeu
 **/
 PlayState::PlayState(GameEngine* theGameEngine): m_playerOne(0),m_map(0)
-,m_scoreK(0),m_scoreP(0)
+,m_scoreK(0),m_scoreP(0),m_dMovX(0),m_dMovY(0),m_draMovX(true),m_draMovY(true)
 ,m_gameEngine(theGameEngine){
-
 
     m_playerOne= new Player(&m_map);
 
@@ -33,7 +32,12 @@ PlayState::PlayState(GameEngine* theGameEngine): m_playerOne(0),m_map(0)
     m_mapEntity=m_map->GetMapEntity();
     m_playerOne->SetMapObject(m_mapEntity);
 
-    m_map->GenerateMap(3,300,20,6,10,3,6);
+    m_map->GenerateMap(3,300,20,6,10,3,6,1);
+
+    m_dragon.SetTexture(GameConfig::g_imgManag["dragon"].img);
+    m_dragon.SetScale(2,2);
+
+   m_camera=sf::View(m_playerOne->GetViewRect());
 }
 /**
     Initialisation des éléments du jeu
@@ -75,10 +79,25 @@ void PlayState::loop(){
     movePlayer(*m_playerOne);
 
  //! Déplacement de la caméra
-    m_gameEngine->m_app.SetView(sf::View(m_playerOne->GetViewRect()));
+    m_camera.SetCenter(0.05*m_gameEngine->m_app.GetFrameTime()+m_camera.GetCenter().x, m_playerOne->GetPosition().y);
+    m_gameEngine->m_app.SetView(m_camera);
 
  //! Déplacement des objets
     moveObject();
+ //! Déplacement du dragon
+ if(m_draMovX && m_dMovX>0)m_draMovX=false;
+ if(!m_draMovX && m_dMovX<-20.f)m_draMovX=true;
+
+ if(m_draMovX)m_dMovX+=0.03*m_gameEngine->m_app.GetFrameTime();
+ else m_dMovX-=0.03*m_gameEngine->m_app.GetFrameTime();
+
+ if(m_draMovY && m_dMovY>40)m_draMovY=false;
+ if(!m_draMovY && m_dMovY<20.f)m_draMovY=true;
+
+ if(m_draMovY)m_dMovY+=0.01*m_gameEngine->m_app.GetFrameTime();
+ else m_dMovY-=0.01*m_gameEngine->m_app.GetFrameTime();
+    m_dragon.SetPosition(m_gameEngine->m_app.GetView().GetCenter().x-m_gameEngine->m_app.GetView().GetSize().x/2+m_dMovX,
+                        m_gameEngine->m_app.GetView().GetCenter().y-m_gameEngine->m_app.GetView().GetSize().y/2+m_dMovY);
 }
 /**
     Pause le jeu
@@ -116,6 +135,7 @@ void PlayState::GetEvents(sf::Event){
 **/
 void PlayState::draw(){
     m_map->Draw();
+    m_gameEngine->m_app.Draw(m_dragon);
 }
 
 /**
@@ -160,7 +180,17 @@ void PlayState::movePlayer(Player &player){
     else player.SetVely(0);
 
     //! Ouch!
-    if(kill)player.SetPosition(m_map->m_spawnLocationOne);
+    if(kill){
+        for(int y=0;y<m_map->m_height;y++){
+            for(int x=0;x<m_map->m_width;x++){
+                m_map->m_tileSet.at(x).at(y).tile.SetColor(sf::Color::White);
+                m_map->m_tileSet.at(x).at(y).touch=false;
+            }
+        }
+
+        player.SetPosition(m_map->m_spawnLocationOne);
+        m_camera=sf::View(m_playerOne->GetViewRect());
+    }
 }
 
 /**
