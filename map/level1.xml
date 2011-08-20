@@ -1,0 +1,62 @@
+<?xml version="1.0" ?>
+<map name="Dwarf Bed" author="Norgas">
+	<metadata>
+		<info name="mappath" value="map/level1/level1.png" />
+		<info name="backpath" value="map/level1/level1_b.png" />
+		<info name="tilepath" value="map/level1/tilesimage.png" />
+		<info name="corrpath" value="map/level1/tile.png" />
+		<!--<info name="backbackpath" value="map/level1/shadow.png" x="0" y="100"/>-->
+	</metadata>
+	<flag>
+		<position x="24" y="7" color="0"/>
+	</flag>
+	<items>
+		<position x1="24" y1="7"  x2="3" y2="27"  x3="45" y3="27"/>
+	</items>
+	<tileset>
+		<tile x="0" y="0" visible="0" solid="0" spawn="0" kill="0" />
+		<tile x="1" y="0" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="2" y="0" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="3" y="0" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="4" y="0" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="5" y="0" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="6" y="0" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="7" y="0" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="8" y="0" visible="0" solid="1" spawn="0" kill="0" />
+		<tile x="9" y="0" visible="1" solid="0" spawn="1" kill="0" />
+		<tile x="10" y="0" visible="1" solid="0" spawn="2" kill="0" />
+		<tile x="11" y="0" visible="1" solid="0" spawn="0" kill="1" />
+
+		<tile x="0" y="1" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="1" y="1" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="2" y="1" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="3" y="1" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="4" y="1" visible="1" solid="0" spawn="0" kill="0" />
+		<tile x="5" y="1" visible="1" solid="0" spawn="0" kill="0" />
+		<tile x="6" y="1" visible="1" solid="0" spawn="0" kill="0" />
+		<tile x="7" y="1" visible="1" solid="0" spawn="0" kill="0" />
+		<tile x="8" y="1" visible="1" solid="0" spawn="0" kill="0" />
+		<tile x="9" y="1" visible="1" solid="0" spawn="0" kill="0" />
+		<tile x="10" y="1" visible="1" solid="0" spawn="0" kill="0" />
+
+		<tile x="0" y="2" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="1" y="2" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="2" y="2" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="3" y="2" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="4" y="2" visible="1" solid="0" spawn="0" kill="0" />
+		<tile x="5" y="2" visible="1" solid="0" spawn="0" kill="0" />
+		<tile x="6" y="2" visible="1" solid="0" spawn="0" kill="0" />
+		<tile x="7" y="2" visible="1" solid="0" spawn="0" kill="0" />
+		<tile x="8" y="2" visible="1" solid="0" spawn="0" kill="0" />
+		<tile x="9" y="2" visible="1" solid="0" spawn="0" kill="0" />
+
+		<tile x="0" y="3" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="1" y="3" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="2" y="3" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="3" y="3" visible="1" solid="1" spawn="0" kill="0" />
+		<tile x="4" y="3" visible="1" solid="0" spawn="0" kill="0" />
+		<tile x="5" y="3" visible="1" solid="0" spawn="0" kill="0" />
+		<tile x="6" y="3" visible="1" solid="0" spawn="0" kill="0" />
+		<tile x="7" y="3" visible="1" solid="0" spawn="0" kill="0" />
+	</tileset>
+</map>
