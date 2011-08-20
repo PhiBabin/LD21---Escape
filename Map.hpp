@@ -28,7 +28,7 @@ class MapTile{
 	public:
         MapTile();
         MapTile(sf::RenderWindow *App,Player *playerOne);
-		void GenerateMap(int wmap,int hmap, int pmin, int pmax, int dmin, int dmax);
+		void GenerateMap(int rate,int wmap,int hmap, int pmin, int pmax, int dmin, int dmax);
 		void LoadMap();
 		void Draw();
         vector<Type> & operator [] (int X);
@@ -42,11 +42,11 @@ class MapTile{
         //! Public variable
 		int m_width, m_height;
 		sf::Vector2f m_spawnLocationOne;
+		vector <vector<Type> > m_tileSet;
 	private:
         sf::RenderWindow *m_app;
 		sf::Texture m_ImgTypeTile;
 		sf::Sprite m_drawSprite;
-		vector <vector<Type> > m_tileSet;
 		vector <Type> m_typeList;
 		vector <GameEntity*> m_mapEntity;
 		Player *m_playerOne;

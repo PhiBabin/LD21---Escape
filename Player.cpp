@@ -70,6 +70,7 @@ void Player::Turn(bool left, bool right){
 }
  bool Player::CollisionGeneral(const sf::FloatRect playerRect,bool &kill){
     int maxHeight, minHeight, maxWidth, minWidth;
+    bool collision=false;
     minHeight=playerRect.Top/GameConfig::g_config["tileheight"];
     minWidth=playerRect.Left/GameConfig::g_config["tilewidth"];
     maxHeight=(playerRect.Top+playerRect.Height-1)/GameConfig::g_config["tileheight"];
@@ -83,14 +84,17 @@ void Player::Turn(bool left, bool right){
         for(int x=minWidth;x<=maxWidth;x++){
             if(!(x>=(*m_map)->m_width or y>=(*m_map)->m_height)){
                 if((*m_map)->Tile(x,y).kill)kill=true;
-                if((*m_map)->Tile(x,y).solid){
+                if((*m_map)->Tile(x,y).solid && !((*m_map)->Tile(x,y).touch && (*m_map)->Tile(x,y).tile.GetColor().a==0)){
+                    if((*m_map)->Tile(x,y).fall)(*m_map)->m_tileSet.at(x).at(y).touch=true;
                     sf::FloatRect  theTile(x*GameConfig::g_config["tilewidth"],y*GameConfig::g_config["tileheight"],GameConfig::g_config["tilewidth"],GameConfig::g_config["tileheight"]);
-                    if(playerRect.Intersects(theTile)||theTile.Intersects(playerRect)) return true;
+                    if(playerRect.Intersects(theTile)||theTile.Intersects(playerRect)){
+                        collision= true;
+                    }
                 }
             }
         }
     }
-    return false;
+    return collision;
  }
  bool Player::CollisionVertical(const sf::FloatRect playerRect, bool &haut, bool &bas,int &solidLimit){
     int maxHeight, minHeight, maxWidth, minWidth;
@@ -111,6 +115,7 @@ void Player::Turn(bool left, bool right){
                     sf::FloatRect  theTile(x*GameConfig::g_config["tilewidth"],y*GameConfig::g_config["tileheight"],GameConfig::g_config["tilewidth"],GameConfig::g_config["tileheight"]);
                     if(playerRect.Intersects(theTile)||theTile.Intersects(playerRect)){
                         CollisionVertical=true;
+                        if((*m_map)->Tile(x,y).fall)(*m_map)->m_tileSet.at(x).at(y).touch=true;
                         if(y*GameConfig::g_config["tileheight"]<=playerRect.Top+playerRect.Height&&y*GameConfig::g_config["tileheight"]>=playerRect.Top){
                             bas=true;
                             solidLimit=y;
@@ -139,19 +144,23 @@ void Player::Turn(bool left, bool right){
     if(maxWidth>(*m_map)->m_width)maxWidth=(*m_map)->m_width;
     for(int y=minHeight;y<=maxHeight;y++){
         for(int x=minWidth;x<=maxWidth;x++){
-            if(!(x>=(*m_map)->m_width or y>=(*m_map)->m_height)&&(*m_map)->Tile(x,y).solid){
-                sf::FloatRect  theTile(x*GameConfig::g_config["tilewidth"],y*GameConfig::g_config["tileheight"],GameConfig::g_config["tilewidth"],GameConfig::g_config["tileheight"]);
-                if(playerRect.Intersects(theTile)||theTile.Intersects(playerRect)){
-                    CollisionHorizontal= true;
-                    if(x*GameConfig::g_config["tilewidth"]>=playerRect.Left&&x*GameConfig::g_config["tilewidth"]<=playerRect.Left+playerRect.Width){
-                        droite=true;
-                        solidLimit=x;
-                    }
-                    if((x+1)*GameConfig::g_config["tilewidth"]<=playerRect.Left+playerRect.Width&&(x+1)*GameConfig::g_config["tilewidth"]>=playerRect.Left){
-                        gauche=true;
-                        solidLimit=x;
+            if(!(x>=(*m_map)->m_width or y>=(*m_map)->m_height)){
+                if((*m_map)->Tile(x,y).solid && !((*m_map)->Tile(x,y).touch && (*m_map)->Tile(x,y).tile.GetColor().a==0)){
+                    sf::FloatRect  theTile(x*GameConfig::g_config["tilewidth"],y*GameConfig::g_config["tileheight"],GameConfig::g_config["tilewidth"],GameConfig::g_config["tileheight"]);
+                    if(playerRect.Intersects(theTile)||theTile.Intersects(playerRect)){
+                        CollisionHorizontal= true;
+                        if((*m_map)->Tile(x,y).fall)(*m_map)->m_tileSet.at(x).at(y).touch=true;
+                        if(x*GameConfig::g_config["tilewidth"]>=playerRect.Left&&x*GameConfig::g_config["tilewidth"]<=playerRect.Left+playerRect.Width){
+                            droite=true;
+                            solidLimit=x;
+                        }
+                        if((x+1)*GameConfig::g_config["tilewidth"]<=playerRect.Left+playerRect.Width&&(x+1)*GameConfig::g_config["tilewidth"]>=playerRect.Left){
+                            gauche=true;
+                            solidLimit=x;
+                        }
                     }
                 }
+
             }
         }
     }

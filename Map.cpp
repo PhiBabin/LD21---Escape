@@ -28,7 +28,7 @@ m_width(0),m_height(0),m_app(App),m_playerOne(playerOne){
  }
 
 Type MapTile::Tile(float x, float y){
-    return m_tileSet.at(x).at(y);
+    return (m_tileSet.at(x)).at(y);
  }
 
  vector<GameEntity*> * MapTile::GetMapEntity(){
@@ -64,11 +64,17 @@ void MapTile::Draw(){
     cout<<"FPS="<</*1.f/(m_app->GetFrameTime())*1000<<*/"Joueur 1 x="<<m_playerOne->GetPosition().x/GameConfig::g_config["tilewidth"]
     <<" y="<<m_playerOne->GetPosition().y<<" vely="<<m_playerOne->GetVely()<<" velx="<<m_playerOne->GetVelx()<<endl;
     //! On affiche les tiles du foreground
+    float falling;
     for(int y=0;y<m_height;y++){
         for(int x=0;x<m_width;x++){
-                if((m_tileSet.at(x)).at(y).visible){
-                    m_app->Draw(m_tileSet.at(x).at(y).tile);
-                }
+            if((m_tileSet.at(x)).at(y).fall&& (m_tileSet.at(x)).at(y).touch){
+                falling=(m_tileSet.at(x)).at(y).tile.GetColor().a-0.2*m_app->GetFrameTime();
+                if(falling<0)falling=0;
+                (m_tileSet.at(x)).at(y).tile.SetColor(sf::Color(255,255,255,falling));
+            }
+            if((m_tileSet.at(x)).at(y).visible){
+                m_app->Draw(m_tileSet.at(x).at(y).tile);
+            }
         }
     }
     //! On affiche le personnage et ces éléments
@@ -96,7 +102,7 @@ vector<Type> & MapTile::operator [] (int X){
         exit(0);
         return 0;
  }
-void MapTile::GenerateMap(int wmap,int hmap, int pmin, int pmax, int dmin, int dmax){
+void MapTile::GenerateMap(int rate,int wmap,int hmap, int pmin, int pmax, int dmin, int dmax){
 	m_tileSet.erase(m_tileSet.begin(),m_tileSet.end());
     m_width=wmap;
     m_height=hmap;
@@ -115,9 +121,9 @@ void MapTile::GenerateMap(int wmap,int hmap, int pmin, int pmax, int dmin, int d
     int firstP=rand() % (hmap/2) + 3;
     int longerP=rand() % pmax + pmin;
     for(int x=0;x<longerP;x++){
-        (m_tileSet.at(x)).at(firstP)=m_typeList[KNIGHT];
+        (m_tileSet.at(x)).at(firstP)=m_typeList[BLOCK];
         (m_tileSet.at(x)).at(firstP).tile.SetPosition(x*GameConfig::g_config["tilewidth"],firstP*GameConfig::g_config["tileheight"]);
-        (m_tileSet.at(x)).at(firstP).tile.SetSubRect(m_typeList[KNIGHT].zoneRect);
+        (m_tileSet.at(x)).at(firstP).tile.SetSubRect(m_typeList[BLOCK].zoneRect);
     }
     //! On met le spawn
     sf::Vector2f spawnLocationOne(3*GameConfig::g_config["tilewidth"] ,(firstP-1)*GameConfig::g_config["tileheight"]-GameConfig::g_config["playercollheight"]);
@@ -126,11 +132,14 @@ void MapTile::GenerateMap(int wmap,int hmap, int pmin, int pmax, int dmin, int d
 
     int cursor= longerP+3;
     int hight= firstP+rand() % 3 - 3;
+    int trans=KNIGHT;
     while(cursor+longerP<wmap){
+        if(rand() % rate +1 == 1)trans=PRINCESS;
+        else trans=KNIGHT;
         for(int x=cursor;x<cursor+longerP;x++){
-            (m_tileSet.at(x)).at(hight)=m_typeList[BLOCK];
+            (m_tileSet.at(x)).at(hight)=m_typeList[trans];
             (m_tileSet.at(x)).at(hight).tile.SetPosition(x*GameConfig::g_config["tilewidth"],hight*GameConfig::g_config["tileheight"]);
-            (m_tileSet.at(x)).at(hight).tile.SetSubRect(m_typeList[BLOCK].zoneRect);
+            (m_tileSet.at(x)).at(hight).tile.SetSubRect(m_typeList[trans].zoneRect);
         }
         cursor+=longerP+rand() % dmax + dmin;
         if(hight+5>wmap)hight-=rand() % 4 +1;
@@ -222,6 +231,7 @@ void MapTile::LoadMap(){
 
         if(atoi(pElem->Attribute("fall"))==1)newTile.fall=true;
         else newTile.fall=false;
+
         newTile.touch=false;
 
         m_typeList.insert(m_typeList.end(),newTile);
