@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <img>
-	<anim name="player" path="img/player.png" nbrCollums="1" nbrLines="1" />
+	<anim name="player" path="img/player.png" nbrCollums="1" nbrLines="2" />
+	<anim name="coin" path="img/coin.png" nbrCollums="6" nbrLines="1" />
 </img>
 <sound>
 	<wav name="jump" path="sounds/jump.wav" />
@@ -12,8 +13,8 @@
 	<option name="tileheight" value="10" />
 	<option name="tilesetwidth" value="10" />
 	<option name="tilesetheight" value="9" />
-	<option name="playercollwidth" value="5" />
-	<option name="playercollheight" value="10" />
+	<option name="playercollwidth" value="3" />
+	<option name="playercollheight" value="8" />
 	<option name="gravity" value="350" />
 	<option name="jump" value="-200" />
 	<option name="starthp" value="100" />

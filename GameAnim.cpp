@@ -20,19 +20,20 @@ GameAnim::GameAnim(sf::Texture &img,int nbrFrame,int nbrLigne,float time=0.f,flo
  GameEntity(img,nbrFrame,nbrLigne,height, width,offsetColX,offsetColY,col),m_nbrFrame(nbrFrame){
     m_velx=velx;
     m_vely=vely;
-    loop(false);
+     if(height==0){
+         m_colHeight=img.GetHeight()/nbrLigne;
+         m_colWidth=img.GetWidth()/nbrFrame;
+     }
+    loop(true);
 }
 bool GameAnim::isDraw(){
     return true;
 }
 bool GameAnim::isDelete()const{
-    if(currentFrame()==(m_nbrFrame-1)||!isPlaying())return true;
-    else{
-        return false;
-    }
+    return false;
 }
 bool GameAnim::isCollision()const{
-    return m_col;
+    return true;
 }
 bool GameAnim::collisionEffect(Player &player){return false;}
 GameAnim::~GameAnim(){

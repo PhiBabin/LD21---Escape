@@ -38,15 +38,15 @@ class Player:public ImgAnim{
     //! Saut
         void Jump();
         void UnlockJump();
+    //! Switch
+        void Switch();
+        bool IsPrincess();
     //! Déplacement
         void Turn(bool left, bool right);
         void TurnUp(bool up);
     //! Link la liste des entités
         void SetMapObject(vector<GameEntity*> *listObject);
     //! Vie et mort
-        int GetHp();
-        void SetHp(int nhp);
-        void Degat(int degats);
         bool IsDead();
     //! Velocité
         void Gravity(sf::RenderWindow &app);
@@ -62,16 +62,14 @@ class Player:public ImgAnim{
         MapTile **m_map;
         vector<GameEntity*> *m_listObject;
 
-        int m_hp;
         float m_velx;
         float m_vely;
         bool m_jumpLock;
         bool m_colBot;
         bool m_direction;
-        bool m_lookUp;
         bool m_moving;
+        bool m_princess;
 
-        PausableClock m_lastShot;
-        PausableClock m_hurt;
+        PausableClock m_switch;
 };
 #endif // PLAYER_HPP_INCLUDED

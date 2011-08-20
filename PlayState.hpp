@@ -34,6 +34,7 @@ class PlayState: public GameState {
         Player *m_playerOne;
         MapTile *m_map;
         bool m_start;
+        int m_scoreP,m_scoreK;
 
         vector<GameEntity*> *m_mapEntity;
         GameEngine *m_gameEngine;

@@ -140,6 +140,10 @@ void MapTile::GenerateMap(int rate,int wmap,int hmap, int pmin, int pmax, int dm
             (m_tileSet.at(x)).at(hight)=m_typeList[trans];
             (m_tileSet.at(x)).at(hight).tile.SetPosition(x*GameConfig::g_config["tilewidth"],hight*GameConfig::g_config["tileheight"]);
             (m_tileSet.at(x)).at(hight).tile.SetSubRect(m_typeList[trans].zoneRect);
+            m_mapEntity.push_back(new GameAnim(GameConfig::g_imgManag["coin"].img,GameConfig::GameConfig::g_imgManag["coin"].nbrCollum,GameConfig::GameConfig::g_imgManag["coin"].nbrLine));
+            m_mapEntity.back()->SetPosition(x*GameConfig::g_config["tilewidth"],(hight-1)*GameConfig::g_config["tileheight"]);
+            m_mapEntity.back()->setDelay(0.1);
+            m_mapEntity.back()->SetScale(0.5,0.5);
         }
         cursor+=longerP+rand() % dmax + dmin;
         if(hight+5>wmap)hight-=rand() % 4 +1;

@@ -18,10 +18,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "Player.hpp"
 Player::Player(MapTile **map):
 ImgAnim::ImgAnim(GameConfig::g_imgManag["player"].img,GameConfig::g_imgManag["player"].nbrCollum,GameConfig::g_imgManag["player"].nbrLine)
-,m_hp(GameConfig::g_config["starthp"])
 ,m_map(map)
 ,m_velx(0),m_vely(0),
-m_jumpLock(false),m_colBot(false),m_direction(false),m_lookUp(false),m_moving(false)
+m_jumpLock(false),m_colBot(false),m_direction(false),m_moving(false),m_princess(false)
 {
    pause();
 }
@@ -45,10 +44,6 @@ void Player::Jump(){
         m_vely+=GameConfig::g_config["jump"];
         SetBottomCollision(false);
     }
-}
-void Player::TurnUp(bool up){
-    if(up==HAUT)m_lookUp=true;
-    else m_lookUp=false;
 }
 void Player::Turn(bool left, bool right){
 
@@ -84,11 +79,15 @@ void Player::Turn(bool left, bool right){
         for(int x=minWidth;x<=maxWidth;x++){
             if(!(x>=(*m_map)->m_width or y>=(*m_map)->m_height)){
                 if((*m_map)->Tile(x,y).kill)kill=true;
-                if((*m_map)->Tile(x,y).solid && !((*m_map)->Tile(x,y).touch && (*m_map)->Tile(x,y).tile.GetColor().a==0)){
-                    if((*m_map)->Tile(x,y).fall)(*m_map)->m_tileSet.at(x).at(y).touch=true;
-                    sf::FloatRect  theTile(x*GameConfig::g_config["tilewidth"],y*GameConfig::g_config["tileheight"],GameConfig::g_config["tilewidth"],GameConfig::g_config["tileheight"]);
-                    if(playerRect.Intersects(theTile)||theTile.Intersects(playerRect)){
-                        collision= true;
+                if(((*m_map)->Tile(x,y).fall && IsPrincess() && !(*m_map)->Tile(x,y).princess)||
+                ((*m_map)->Tile(x,y).fall && !IsPrincess() && (*m_map)->Tile(x,y).princess)||
+                !(*m_map)->Tile(x,y).fall){
+                    if((*m_map)->Tile(x,y).solid && !((*m_map)->Tile(x,y).touch && (*m_map)->Tile(x,y).tile.GetColor().a==0)){
+                        if((*m_map)->Tile(x,y).fall)(*m_map)->m_tileSet.at(x).at(y).touch=true;
+                        sf::FloatRect  theTile(x*GameConfig::g_config["tilewidth"],y*GameConfig::g_config["tileheight"],GameConfig::g_config["tilewidth"],GameConfig::g_config["tileheight"]);
+                        if(playerRect.Intersects(theTile)||theTile.Intersects(playerRect)){
+                            collision= true;
+                        }
                     }
                 }
             }
@@ -111,17 +110,21 @@ void Player::Turn(bool left, bool right){
     for(int y=minHeight;y<=maxHeight;y++){
         for(int x=minWidth;x<=maxWidth;x++){
             if(!(x>=(*m_map)->m_width or y>=(*m_map)->m_height)){
-                if((*m_map)->Tile(x,y).solid && !((*m_map)->Tile(x,y).touch && (*m_map)->Tile(x,y).tile.GetColor().a==0)){
-                    sf::FloatRect  theTile(x*GameConfig::g_config["tilewidth"],y*GameConfig::g_config["tileheight"],GameConfig::g_config["tilewidth"],GameConfig::g_config["tileheight"]);
-                    if(playerRect.Intersects(theTile)||theTile.Intersects(playerRect)){
-                        CollisionVertical=true;
-                        if((*m_map)->Tile(x,y).fall)(*m_map)->m_tileSet.at(x).at(y).touch=true;
-                        if(y*GameConfig::g_config["tileheight"]<=playerRect.Top+playerRect.Height&&y*GameConfig::g_config["tileheight"]>=playerRect.Top){
-                            bas=true;
-                            solidLimit=y;
-                        }
-                        if((y+1)*GameConfig::g_config["tileheight"]>=playerRect.Top&&(y+1)*GameConfig::g_config["tileheight"]<=playerRect.Top+playerRect.Height){
-                            haut=true;
+                if(((*m_map)->Tile(x,y).fall && IsPrincess() && !(*m_map)->Tile(x,y).princess)||
+                ((*m_map)->Tile(x,y).fall && !IsPrincess() && (*m_map)->Tile(x,y).princess)||
+                !(*m_map)->Tile(x,y).fall){
+                    if((*m_map)->Tile(x,y).solid && !((*m_map)->Tile(x,y).touch && (*m_map)->Tile(x,y).tile.GetColor().a==0)){
+                        sf::FloatRect  theTile(x*GameConfig::g_config["tilewidth"],y*GameConfig::g_config["tileheight"],GameConfig::g_config["tilewidth"],GameConfig::g_config["tileheight"]);
+                        if(playerRect.Intersects(theTile)||theTile.Intersects(playerRect)){
+                            CollisionVertical=true;
+                            if((*m_map)->Tile(x,y).fall)(*m_map)->m_tileSet.at(x).at(y).touch=true;
+                            if(y*GameConfig::g_config["tileheight"]<=playerRect.Top+playerRect.Height&&y*GameConfig::g_config["tileheight"]>=playerRect.Top){
+                                bas=true;
+                                solidLimit=y;
+                            }
+                            if((y+1)*GameConfig::g_config["tileheight"]>=playerRect.Top&&(y+1)*GameConfig::g_config["tileheight"]<=playerRect.Top+playerRect.Height){
+                                haut=true;
+                            }
                         }
                     }
                 }
@@ -145,18 +148,22 @@ void Player::Turn(bool left, bool right){
     for(int y=minHeight;y<=maxHeight;y++){
         for(int x=minWidth;x<=maxWidth;x++){
             if(!(x>=(*m_map)->m_width or y>=(*m_map)->m_height)){
-                if((*m_map)->Tile(x,y).solid && !((*m_map)->Tile(x,y).touch && (*m_map)->Tile(x,y).tile.GetColor().a==0)){
-                    sf::FloatRect  theTile(x*GameConfig::g_config["tilewidth"],y*GameConfig::g_config["tileheight"],GameConfig::g_config["tilewidth"],GameConfig::g_config["tileheight"]);
-                    if(playerRect.Intersects(theTile)||theTile.Intersects(playerRect)){
-                        CollisionHorizontal= true;
-                        if((*m_map)->Tile(x,y).fall)(*m_map)->m_tileSet.at(x).at(y).touch=true;
-                        if(x*GameConfig::g_config["tilewidth"]>=playerRect.Left&&x*GameConfig::g_config["tilewidth"]<=playerRect.Left+playerRect.Width){
-                            droite=true;
-                            solidLimit=x;
-                        }
-                        if((x+1)*GameConfig::g_config["tilewidth"]<=playerRect.Left+playerRect.Width&&(x+1)*GameConfig::g_config["tilewidth"]>=playerRect.Left){
-                            gauche=true;
-                            solidLimit=x;
+                if(((*m_map)->Tile(x,y).fall && IsPrincess() && !(*m_map)->Tile(x,y).princess)||
+                ((*m_map)->Tile(x,y).fall && !IsPrincess() && (*m_map)->Tile(x,y).princess)||
+                !(*m_map)->Tile(x,y).fall){
+                    if((*m_map)->Tile(x,y).solid && !((*m_map)->Tile(x,y).touch && (*m_map)->Tile(x,y).tile.GetColor().a==0)){
+                        sf::FloatRect  theTile(x*GameConfig::g_config["tilewidth"],y*GameConfig::g_config["tileheight"],GameConfig::g_config["tilewidth"],GameConfig::g_config["tileheight"]);
+                        if(playerRect.Intersects(theTile)||theTile.Intersects(playerRect)){
+                            CollisionHorizontal= true;
+                            if((*m_map)->Tile(x,y).fall)(*m_map)->m_tileSet.at(x).at(y).touch=true;
+                            if(x*GameConfig::g_config["tilewidth"]>=playerRect.Left&&x*GameConfig::g_config["tilewidth"]<=playerRect.Left+playerRect.Width){
+                                droite=true;
+                                solidLimit=x;
+                            }
+                            if((x+1)*GameConfig::g_config["tilewidth"]<=playerRect.Left+playerRect.Width&&(x+1)*GameConfig::g_config["tilewidth"]>=playerRect.Left){
+                                gauche=true;
+                                solidLimit=x;
+                            }
                         }
                     }
                 }
@@ -169,22 +176,8 @@ void Player::Turn(bool left, bool right){
 void Player::SetMapObject(vector<GameEntity*> *listObject){
     m_listObject=listObject;
 }
-
-void Player::Degat(int degats){
-    m_hp-=degats;
-}
-int Player::GetHp(){
-    return m_hp;
-}
-void Player::SetHp(int nhp){
-    m_hp=nhp;
-}
 bool Player::IsDead(){
-    if(m_hp<=0){
-        m_hp=GameConfig::g_config["starthp"];
-        return true;
-    }
-    else return false;
+    return true;
 }
 float Player::GetVelx(){
     return m_velx;
@@ -208,17 +201,25 @@ void Player::UnlockJump(){
     m_jumpLock=false;
     m_vely=0;
 }
-
+bool Player::IsPrincess(){
+    return m_princess;
+}
+void Player::Switch(){
+    if(m_switch.GetElapsedTime()>500){
+        if(m_princess)m_princess=false;
+        else m_princess=true;
+        m_switch.Reset();
+    }
+}
 void Player::Drawing(sf::RenderWindow* app){
-
+    if(m_princess)setAnimRow(1);
+    else setAnimRow(0);
 }
 void Player::Pause(){
-    m_lastShot.Pause();
-    m_hurt.Pause();
+    m_switch.Pause();
 }
 void Player::Resume(){
-    m_lastShot.Play();
-    m_hurt.Play();
+    m_switch.Play();
 }
 Player::~Player(){
 }

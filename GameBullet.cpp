@@ -40,7 +40,7 @@ bool GameBullet::isCollision()const{
 }
 bool GameBullet::collisionEffect(Player &player){
     if(&player!=&(*m_from)){
-        player.Degat(m_degat);
+        //player.Degat(m_degat);
         return true;
     }
     else return false;

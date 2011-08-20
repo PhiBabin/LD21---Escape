@@ -22,6 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
     Construction des éléments du jeu
 **/
 PlayState::PlayState(GameEngine* theGameEngine): m_playerOne(0),m_map(0)
+,m_scoreK(0),m_scoreP(0)
 ,m_gameEngine(theGameEngine){
 
 
@@ -52,9 +53,8 @@ void PlayState::loop(){
 
     //! Control du joueur 1
     if (sf::Keyboard::IsKeyPressed(sf::Keyboard::X))m_playerOne->Jump();
-    m_playerOne->TurnUp(sf::Keyboard::IsKeyPressed(sf::Keyboard::Up));
     m_playerOne->Turn(sf::Keyboard::IsKeyPressed(sf::Keyboard::Left),sf::Keyboard::IsKeyPressed(sf::Keyboard::Right));
-    //if(sf::Keyboard::IsKeyPressed(sf::Keyboard::Z))m_playerOne->Shoot();
+    if(sf::Keyboard::IsKeyPressed(sf::Keyboard::Z))m_playerOne->Switch();
 
 
 //    const sf::Input &Input =m_gameEngine->m_app.GetInput();
@@ -172,23 +172,13 @@ void PlayState::moveObject(){
             //! On affiche détermine le rectangle de l'object
             sf::FloatRect Rect=m_mapEntity->at(i)->GetMovedRect(m_mapEntity->at(i)->GetVelx()*m_gameEngine->m_app.GetFrameTime()/1000.f,m_mapEntity->at(i)->GetVely()*m_gameEngine->m_app.GetFrameTime()/1000.f);
             //! On vérifie si l'object touche le joueur si oui on supprimer l'objet et crée un animation d'un explosion
-            if((m_playerOne->GetPlayerRect().Intersects(Rect) && m_mapEntity->at(i)->collisionEffect(*m_playerOne))){
+            if((m_playerOne->GetPlayerRect().Intersects(Rect))){
                 //! On crée libère la mémoire de le l'instance de l'objet
                 delete m_mapEntity->at(i);
                 //! On supprime le pointeur du tableau dynamique
                 m_mapEntity->erase(m_mapEntity->begin()+i);
-            }
-            else if(!m_map->CollisionGeneral(Rect))
-                //! On déplace l'objet
-                m_mapEntity->at(i)->Move(Rect.Left-m_mapEntity->at(i)->GetPosition().x, Rect.Top-m_mapEntity->at(i)->GetPosition().y);
-            else {
-//                //! On crée une explosion
-//                m_mapEntity->push_back(new GameAnim(GameConfig::g_imgManag["explosion2"].img,GameConfig::GameConfig::g_imgManag["explosion2"].nbrCollum,GameConfig::GameConfig::g_imgManag["explosion2"].nbrLine));
-//                m_mapEntity->back()->SetPosition(m_mapEntity->at(i)->GetPosition().x,m_mapEntity->at(i)->GetPosition().y);
-//                m_mapEntity->back()->setDelay(0.1);
-                delete m_mapEntity->at(i);
-                m_mapEntity->erase( m_mapEntity->begin() + i );
-                i--;
+                if(m_playerOne->IsPrincess())m_scoreP+=10;
+                else m_scoreK+=10;
             }
         }
         else{
