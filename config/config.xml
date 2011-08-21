@@ -4,6 +4,7 @@
 	<anim name="coin" path="img/coin.png" nbrCollums="6" nbrLines="1" />
 	<anim name="motif" path="img/motif.png" nbrCollums="13" nbrLines="1" />
 	<sprite name="dragon" path="img/dragon.png" nbrCollums="0" nbrLines="0" />
+	<anim name="checkpoint" path="img/flag.png" nbrCollums="1" nbrLines="1" />
 </img>
 <sound>
 	<wav name="jump" path="sounds/jump.wav" />

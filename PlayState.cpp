@@ -187,7 +187,6 @@ void PlayState::movePlayer(Player &player){
                 m_map->m_tileSet.at(x).at(y).touch=false;
             }
         }
-
         player.SetPosition(m_map->m_spawnLocationOne);
         m_camera=sf::View(m_playerOne->GetViewRect());
     }
@@ -204,6 +203,7 @@ void PlayState::moveObject(){
             //! On vérifie si l'object touche le joueur si oui on supprimer l'objet et crée un animation d'un explosion
             if((m_playerOne->GetPlayerRect().Intersects(Rect))){
                 //! On crée libère la mémoire de le l'instance de l'objet
+                if(m_mapEntity->at(i)->collisionEffect(*m_playerOne))m_map->m_spawnLocationOne=m_mapEntity->at(i)->GetPosition();
                 delete m_mapEntity->at(i);
                 //! On supprime le pointeur du tableau dynamique
                 m_mapEntity->erase(m_mapEntity->begin()+i);

@@ -21,7 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 class GameAnim: public GameEntity{
     public:
-        GameAnim(sf::Texture &img,int nbrFrame,int nbrLigne,float time,float velx,float vely,float height, float width,float offsetColX,float offsetColY,bool col);
+        GameAnim(sf::Texture &img,int nbrFrame,int nbrLigne,float time,bool col,float velx,float vely,float height, float width,float offsetColX,float offsetColY);
         virtual bool isDraw();
         virtual bool isDelete()const;
         virtual bool isCollision()const;

@@ -36,6 +36,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define PRINCESS 3
 #define KNIGHT 4
 #define KILL 5
+#define END 6
 
 
 #include <iostream>

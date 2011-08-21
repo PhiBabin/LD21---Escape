@@ -16,7 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.*/
 #include "GameAnim.hpp"
 
-GameAnim::GameAnim(sf::Texture &img,int nbrFrame,int nbrLigne,float time=0.f,float velx=0,float vely=0,float height=0, float width=0,float offsetColX=0,float offsetColY=0,bool col=false):
+GameAnim::GameAnim(sf::Texture &img,int nbrFrame,int nbrLigne,float time=0.f,bool col=false,float velx=0,float vely=0,float height=0, float width=0,float offsetColX=0,float offsetColY=0):
  GameEntity(img,nbrFrame,nbrLigne,height, width,offsetColX,offsetColY,col),m_nbrFrame(nbrFrame){
     m_velx=velx;
     m_vely=vely;
@@ -35,6 +35,8 @@ bool GameAnim::isDelete()const{
 bool GameAnim::isCollision()const{
     return true;
 }
-bool GameAnim::collisionEffect(Player &player){return false;}
+bool GameAnim::collisionEffect(Player &player){
+    return m_col;
+}
 GameAnim::~GameAnim(){
 }

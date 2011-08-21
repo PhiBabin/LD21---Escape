@@ -19,6 +19,7 @@
 		<tile x="2" y="0" visible="1" solid="1" spawn="0" kill="0" princess="0" fall="0"/>
 		<tile x="3" y="0" visible="1" solid="1" spawn="0" kill="0" princess="0" fall="1"/>
 		<tile x="4" y="0" visible="1" solid="1" spawn="0" kill="0" princess="1" fall="1"/>
-		<tile x="5" y="0" visible="1" solid="0" spawn="0" kill="1" princess="0" fall="0"/>
+		<tile x="5" y="0" visible="0" solid="0" spawn="0" kill="1" princess="0" fall="0"/>
+		<tile x="6" y="0" visible="1" solid="0" spawn="0" kill="0" princess="0" fall="0"/>
 	</tileset>
 </map>

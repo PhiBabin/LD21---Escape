@@ -135,6 +135,7 @@ void MapTile::GenerateMap(int rate,int wmap,int hmap, int pmin, int pmax, int dm
     int trans=KNIGHT;
     int towerLarg=rand() % 4 + 1;
     int towerFloor;
+    bool checkPoint=false;
     while(cursor+longerP<wmap){
         if(nbrTower>0 && rand() % 3 +1 == 1 && cursor+longerP<(wmap*0.75)){
             nbrTower--;
@@ -172,14 +173,25 @@ void MapTile::GenerateMap(int rate,int wmap,int hmap, int pmin, int pmax, int dm
             if(rand() % rate +1 == 1)trans=PRINCESS;
             else trans=KNIGHT;
             for(int x=cursor;x<cursor+longerP;x++){
-                (m_tileSet.at(x)).at(hight)=m_typeList[trans];
-                (m_tileSet.at(x)).at(hight).tile.SetPosition(x*GameConfig::g_config["tilewidth"],hight*GameConfig::g_config["tileheight"]);
-                (m_tileSet.at(x)).at(hight).tile.SetSubRect(m_typeList[trans].zoneRect);
+                if(!checkPoint && cursor>wmap/2){
+                    (m_tileSet.at(x)).at(hight)=m_typeList[BLOCK];
+                    (m_tileSet.at(x)).at(hight).tile.SetPosition(x*GameConfig::g_config["tilewidth"],hight*GameConfig::g_config["tileheight"]);
+                    (m_tileSet.at(x)).at(hight).tile.SetSubRect(m_typeList[BLOCK].zoneRect);
 
-                m_mapEntity.push_back(new GameAnim(GameConfig::g_imgManag["coin"].img,GameConfig::GameConfig::g_imgManag["coin"].nbrCollum,GameConfig::GameConfig::g_imgManag["coin"].nbrLine));
-                m_mapEntity.back()->SetPosition(x*GameConfig::g_config["tilewidth"],(hight-1)*GameConfig::g_config["tileheight"]);
-                m_mapEntity.back()->setDelay(0.1);
-                m_mapEntity.back()->SetScale(0.5,0.5);
+                    m_mapEntity.push_back(new GameAnim(GameConfig::g_imgManag["checkpoint"].img,1,1,0,true));
+                    m_mapEntity.back()->SetPosition(x*GameConfig::g_config["tilewidth"],(hight-1)*GameConfig::g_config["tileheight"]);
+                    checkPoint=true;
+                }
+                else{
+                    (m_tileSet.at(x)).at(hight)=m_typeList[trans];
+                    (m_tileSet.at(x)).at(hight).tile.SetPosition(x*GameConfig::g_config["tilewidth"],hight*GameConfig::g_config["tileheight"]);
+                    (m_tileSet.at(x)).at(hight).tile.SetSubRect(m_typeList[trans].zoneRect);
+
+                    m_mapEntity.push_back(new GameAnim(GameConfig::g_imgManag["coin"].img,GameConfig::GameConfig::g_imgManag["coin"].nbrCollum,GameConfig::GameConfig::g_imgManag["coin"].nbrLine));
+                    m_mapEntity.back()->SetPosition(x*GameConfig::g_config["tilewidth"],(hight-1)*GameConfig::g_config["tileheight"]);
+                    m_mapEntity.back()->setDelay(0.1);
+                    m_mapEntity.back()->SetScale(0.5,0.5);
+                }
             }
             cursor+=longerP+rand() % dmax + dmin;
             if(hight+5>wmap)hight-=rand() % 4 +1;
@@ -194,6 +206,13 @@ void MapTile::GenerateMap(int rate,int wmap,int hmap, int pmin, int pmax, int dm
         (m_tileSet.at(x)).at(hmap-1)=m_typeList[KILL];
         (m_tileSet.at(x)).at(hmap-1).tile.SetPosition(x*GameConfig::g_config["tilewidth"],(hmap-1)*GameConfig::g_config["tileheight"]);
         (m_tileSet.at(x)).at(hmap-1).tile.SetSubRect(m_typeList[KILL].zoneRect);
+    }
+    //! On met la ligne d'arriver
+
+    for(int y=0;y<hmap;y++){
+        m_tileSet.at(wmap-1).at(y)=m_typeList[END];
+        m_tileSet.at(wmap-1).at(y).tile.SetPosition((wmap-1)*GameConfig::g_config["tilewidth"],y*GameConfig::g_config["tileheight"]);
+        m_tileSet.at(wmap-1).at(y).tile.SetSubRect(m_typeList[END].zoneRect);
     }
 
 
