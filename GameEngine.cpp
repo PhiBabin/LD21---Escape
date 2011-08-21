@@ -27,7 +27,8 @@ void GameEngine::init(){
    cout<<"  /GameStates::Init"<<endl;
     m_gameState.push_back(NULL);
     m_gameState.push_back(new PlayState(this));
-    m_gameState[0]=m_gameState[1];
+    m_gameState.push_back(new MenuState(this));
+    m_gameState[0]=m_gameState[2];
 }
 /**
     Boucle du Moteur

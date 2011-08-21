@@ -36,7 +36,10 @@ class PlayState: public GameState {
         sf::View m_camera;
         bool m_start,m_end, m_dead, m_draMovX, m_draMovY;
         int m_score, m_level;
+        float m_vitesseDragon;
         sf::Text m_levelInfo;
+        sf::Text m_scoreInfo;
+        ImgAnim m_scoreIcon;
         sf::Sprite m_dragon;
         sf::Sprite m_escape;
         sf::Sprite m_road;
@@ -48,6 +51,7 @@ class PlayState: public GameState {
         sf::Shape m_fade;
         bool m_fadeIn;
         sf::Sound m_deadSound, m_checkpoint, m_coin, m_escapeSound;
+        sf::Music m_music;
 
 
         vector<GameEntity*> *m_mapEntity;

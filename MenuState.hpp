@@ -14,22 +14,31 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.*/
+#ifndef MENUSTATE_HPP_INCLUDED
+#define MENUSTATE_HPP_INCLUDED
 
-#include "includes.hpp"
+class MenuState: public GameState {
+    public:
+        MenuState(GameEngine* theGameEngine);
+        virtual void init();
+        virtual void loop();
+        virtual void stop();
+        virtual void pause();
+        virtual void resume();
+        virtual void GetEvents(sf::Event eventNew);
+        virtual void draw();
+        virtual ~MenuState();
+    private:
+        GameEngine *m_gameEngine;
+        sf::Sprite m_pause;
+        sf::Sprite m_logo;
+        sf::Sprite m_in;
+        sf::Sprite m_press;
 
-int main(){
-   cout<<"  /App Start"<<endl;
+        bool m_start;
+        bool m_scaleUp;
+};
 
-   cout<<"  /App Load Configuration"<<endl;
-   GameConfig::LoadConfig();
 
-    sf::RenderWindow App(sf::VideoMode(GameConfig::g_config["screenwidth"], GameConfig::g_config["screenheight"], 32), "LD21 - Aaah! Run!", sf::Style::Close | sf::Style::Titlebar );
 
-    App.EnableVerticalSync(true);
-
-    cout<<"  /GameEngine   Start"<<endl;
-    GameEngine *Game(0);
-    Game=new GameEngine(App);
-    delete Game;
-
-}
+#endif // MENUSTATE_HPP_INCLUDED

@@ -4,6 +4,10 @@
 	<anim name="coin" path="img/coin.png" nbrCollums="6" nbrLines="1" />
 	<anim name="motif" path="img/motif.png" nbrCollums="13" nbrLines="1" />
 	<sprite name="dragon" path="img/dragon.png" nbrCollums="0" nbrLines="0" />
+	<sprite name="logo" path="img/logo.png" nbrCollums="0" nbrLines="0" />
+	<sprite name="pause" path="img/pause.png" nbrCollums="0" nbrLines="0" />
+	<sprite name="press" path="img/press_any_key.png" nbrCollums="0" nbrLines="0" />
+	<sprite name="int" path="img/instruc.png" nbrCollums="0" nbrLines="0" />
 	<anim name="checkpoint" path="img/flag.png" nbrCollums="1" nbrLines="1" />
 	<sprite name="escape" path="img/escape.png" nbrCollums="0" nbrLines="0" />
 	<sprite name="road" path="img/road.png" nbrCollums="0" nbrLines="0" />

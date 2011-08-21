@@ -21,6 +21,14 @@ MapTile::MapTile(sf::RenderWindow *App, Player *playerOne):
 m_width(0),m_height(0),m_app(App),m_playerOne(playerOne){
 
     LoadMap();
+    for(int y=0;y<=(int)GameConfig::g_config["screenheight"]/4/13;y++){
+        for(int x=0;x<=(int)GameConfig::g_config["screenwidth"]/4/13;x++){
+            m_motif.push_back(ImgAnim(GameConfig::g_imgManag["motif"].img,GameConfig::GameConfig::g_imgManag["motif"].nbrCollum,GameConfig::GameConfig::g_imgManag["motif"].nbrLine));
+            m_motif.back().setDelay(0.1);
+            m_motif.back().SetPosition(x*13,y*13);
+            m_motif.back().play();
+        }
+    }
 }
 
  bool MapTile::CollisionTile(float x, float y){
@@ -63,6 +71,14 @@ Type MapTile::Tile(float x, float y){
 void MapTile::Draw(){
     cout<<"FPS="<</*1.f/(m_app->GetFrameTime())*1000<<*/"Joueur 1 x="<<m_playerOne->GetPosition().x/GameConfig::g_config["tilewidth"]
     <<" y="<<m_playerOne->GetPosition().y<<" vely="<<m_playerOne->GetVely()<<" velx="<<m_playerOne->GetVelx()<<endl;
+    int motifIt=0;
+    for(int y=0;y<=(int)GameConfig::g_config["screenheight"]/4/13;y++){
+        for(int x=0;x<=(int)GameConfig::g_config["screenwidth"]/4/13;x++){
+            m_motif.at(motifIt).SetPosition(x*13+m_app->GetView().GetCenter().x-m_app->GetView().GetSize().x/2,y*13+m_app->GetView().GetCenter().y-m_app->GetView().GetSize().y/2);
+            m_app->Draw(m_motif.at(motifIt));
+            motifIt++;
+        }
+    }
     //! On affiche les tiles du foreground
     float falling;
     for(int y=0;y<m_height;y++){
@@ -137,7 +153,7 @@ void MapTile::GenerateMap(int rate,int wmap,int hmap, int pmin, int pmax, int dm
     int towerFloor;
     bool checkPoint=false;
     while(cursor+longerP<wmap){
-        if(nbrTower>0 && rand() % 3 +1 == 1 && cursor+longerP<(wmap*0.75)){
+        if(nbrTower>0 && rand() % 4 +1 == 1 && cursor+longerP>(wmap*0.75)){
             nbrTower--;
             for(int y=hight;y<hmap-1;y++){
                 (m_tileSet.at(cursor-1)).at(y)=m_typeList[BLOCK];

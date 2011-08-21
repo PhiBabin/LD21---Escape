@@ -47,6 +47,7 @@ class MapTile{
         sf::RenderWindow *m_app;
 		sf::Texture m_ImgTypeTile;
 		sf::Sprite m_drawSprite;
+		vector <ImgAnim> m_motif;
 		vector <Type> m_typeList;
 		vector <GameEntity*> m_mapEntity;
 		Player *m_playerOne;
