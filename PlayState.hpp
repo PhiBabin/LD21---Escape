@@ -34,10 +34,21 @@ class PlayState: public GameState {
         Player *m_playerOne;
         MapTile *m_map;
         sf::View m_camera;
-        bool m_start, m_draMovX, m_draMovY;
-        int m_scoreP,m_scoreK;
+        bool m_start,m_end, m_dead, m_draMovX, m_draMovY;
+        int m_score, m_level;
+        sf::Text m_levelInfo;
         sf::Sprite m_dragon;
+        sf::Sprite m_escape;
+        sf::Sprite m_road;
+        sf::Sprite m_arrow;
+        sf::Sprite m_arrowDragon;
         float m_dMovX, m_dMovY;
+        PausableClock m_transition,m_transitionDead;
+        sf::Font m_font;
+        sf::Shape m_fade;
+        bool m_fadeIn;
+        sf::Sound m_deadSound, m_checkpoint, m_coin, m_escapeSound;
+
 
         vector<GameEntity*> *m_mapEntity;
         GameEngine *m_gameEngine;

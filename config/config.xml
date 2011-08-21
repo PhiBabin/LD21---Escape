@@ -5,9 +5,18 @@
 	<anim name="motif" path="img/motif.png" nbrCollums="13" nbrLines="1" />
 	<sprite name="dragon" path="img/dragon.png" nbrCollums="0" nbrLines="0" />
 	<anim name="checkpoint" path="img/flag.png" nbrCollums="1" nbrLines="1" />
+	<sprite name="escape" path="img/escape.png" nbrCollums="0" nbrLines="0" />
+	<sprite name="road" path="img/road.png" nbrCollums="0" nbrLines="0" />
+	<sprite name="arrow" path="img/arrow.png" nbrCollums="0" nbrLines="0" />
+	<sprite name="arrowdragon" path="img/arrowdragon.png" nbrCollums="0" nbrLines="0" />
 </img>
 <sound>
 	<wav name="jump" path="sounds/jump.wav" />
+	<wav name="dead" path="sounds/dead.wav" />
+	<wav name="checkpoint" path="sounds/checkpoint.wav" />
+	<wav name="escape" path="sounds/escape.wav" />
+	<wav name="pickup_coin" path="sounds/pickup_coin.wav" />
+	<wav name="music" path="sounds/music.wav" />
 </sound>
 <config>
 	<option name="screenwidth" value="800" />

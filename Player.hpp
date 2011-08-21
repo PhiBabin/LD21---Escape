@@ -71,5 +71,6 @@ class Player:public ImgAnim{
         bool m_princess;
 
         PausableClock m_switch;
+        sf::Sound m_jump;
 };
 #endif // PLAYER_HPP_INCLUDED

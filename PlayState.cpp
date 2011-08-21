@@ -22,7 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
     Construction des éléments du jeu
 **/
 PlayState::PlayState(GameEngine* theGameEngine): m_playerOne(0),m_map(0)
-,m_scoreK(0),m_scoreP(0),m_dMovX(0),m_dMovY(0),m_draMovX(true),m_draMovY(true)
+,m_score(0),m_dMovX(0),m_dMovY(0),m_draMovX(true),m_draMovY(true),m_end(false),m_dead(false),m_level(1)
 ,m_gameEngine(theGameEngine){
 
     m_playerOne= new Player(&m_map);
@@ -34,10 +34,36 @@ PlayState::PlayState(GameEngine* theGameEngine): m_playerOne(0),m_map(0)
 
     m_map->GenerateMap(3,300,20,6,10,3,6,1);
 
+    m_escape.SetTexture(GameConfig::g_imgManag["escape"].img);
+    m_escape.SetScale(0.5,0.5);
+    m_escape.SetOrigin(GameConfig::g_imgManag["escape"].img.GetWidth()/2,GameConfig::g_imgManag["escape"].img.GetHeight()/2);
+
     m_dragon.SetTexture(GameConfig::g_imgManag["dragon"].img);
     m_dragon.SetScale(2,2);
+    m_dragon.SetOrigin(GameConfig::g_imgManag["dragon"].img.GetWidth()/2,0);
+    m_dragon.SetPosition(m_playerOne->GetPosition());
+    m_dragon.Move(-200,0);
+
+
+    m_road.SetTexture(GameConfig::g_imgManag["road"].img);
+    m_road.SetOrigin(GameConfig::g_imgManag["road"].img.GetWidth()/2,0);
+
+    m_arrowDragon.SetTexture(GameConfig::g_imgManag["arrowdragon"].img);
+    m_arrowDragon.SetOrigin(GameConfig::g_imgManag["arrowdragon"].img.GetWidth()/2,GameConfig::g_imgManag["arrowdragon"].img.GetHeight());
+
+    m_arrow.SetTexture(GameConfig::g_imgManag["arrow"].img);
+    m_arrow.SetOrigin(GameConfig::g_imgManag["arrow"].img.GetWidth()/2,GameConfig::g_imgManag["arrow"].img.GetHeight());
 
    m_camera=sf::View(m_playerOne->GetViewRect());
+   m_font.LoadFromFile("font/pixel.ttf");
+   m_levelInfo.SetFont(m_font);
+
+    m_fade= sf::Shape::Rectangle(0,0,(int)GameConfig::g_config["screenwidth"]/4,(int)GameConfig::g_config["screenheight"]/4,sf::Color::White);
+
+    m_deadSound.SetBuffer(GameConfig::g_soundManag["dead"]);
+    m_checkpoint.SetBuffer(GameConfig::g_soundManag["checkpoint"]);
+    m_coin.SetBuffer(GameConfig::g_soundManag["pickup_coin"]);
+    m_escapeSound.SetBuffer(GameConfig::g_soundManag["escape"]);
 }
 /**
     Initialisation des éléments du jeu
@@ -50,54 +76,142 @@ void PlayState::init(){
     Exécution des éléments
 **/
 void PlayState::loop(){
-    /**
-        Gestion des entrées claviers
-    */
+    //! On vérifie s'il a gagné.
+    if(m_playerOne->GetPosition().x>(m_map->m_width-1)*GameConfig::g_config["tilewidth"] && !m_end){
+        m_end=true;
+        m_transition.Reset();
+        m_escapeSound.Play();
+    }
+    if(m_end && m_transition.GetElapsedTime()>4000){
+        m_end=false;
+        m_level++;
+        for(unsigned int i=0;i<m_mapEntity->size();i++){
+            delete m_mapEntity->at(i);
+            m_mapEntity->erase(m_mapEntity->begin()+i);
+            i--;
+        }
+        if(m_level==2){
+            m_map->GenerateMap(3,300,20,6,10,3,6,1);
+            m_camera=sf::View(m_playerOne->GetViewRect());
+        }
+        if(m_level==3){
+            m_map->GenerateMap(3,300,20,6,10,3,6,1);
+            m_camera=sf::View(m_playerOne->GetViewRect());
+        }
+        if(m_level>=4){
+            m_map->GenerateMap(3,300,20,6,10,3,6,1);
+            m_camera=sf::View(m_playerOne->GetViewRect());
+        }
+        m_dragon.SetPosition(m_playerOne->GetPosition());
+        m_dragon.Move(-200,0);
+    }
+//!S'il est mort
+    if(m_dead){
+        sleep(0.5);
+        int time=m_transitionDead.GetElapsedTime();
+        if(time>=750){
+            exit(0);
+            for(int y=0;y<m_map->m_height;y++){
+                for(int x=0;x<m_map->m_width;x++){
+                    m_map->m_tileSet.at(x).at(y).tile.SetColor(sf::Color::White);
+                    m_map->m_tileSet.at(x).at(y).touch=false;
+                }
+            }
+            m_playerOne->SetPosition(m_map->m_spawnLocationOne);
+            m_camera=sf::View(m_playerOne->GetViewRect());
+
+            m_dragon.SetPosition(m_playerOne->GetPosition());
+            m_dragon.Move(-200,0);
+        }
+        if(time>=1000){
+            m_fadeIn=false;
+        }
+        if(m_fadeIn){
+            cout<<time<<" "<<time/1000.f*255.f<<endl;
+            m_fade.SetColor(sf::Color(255,255,255,time/1000.f*255.f));
+        }
+        else{
+            m_fade.SetColor(sf::Color(255,255,255,255-(time-1000.f)/1000.f*255.f));
+        }
+    }
+    if(m_dead && m_transitionDead.GetElapsedTime()>2000){
+        m_dead=false;
+    }
+    if(!m_end&&!m_dead){
+        /**
+            Gestion des entrées claviers
+        */
+        //! Control du joueur 1
+        if (sf::Keyboard::IsKeyPressed(sf::Keyboard::X))m_playerOne->Jump();
+        m_playerOne->Turn(sf::Keyboard::IsKeyPressed(sf::Keyboard::Left),sf::Keyboard::IsKeyPressed(sf::Keyboard::Right));
+        if(sf::Keyboard::IsKeyPressed(sf::Keyboard::Z))m_playerOne->Switch();
 
 
-    //! Control du joueur 1
-    if (sf::Keyboard::IsKeyPressed(sf::Keyboard::X))m_playerOne->Jump();
-    m_playerOne->Turn(sf::Keyboard::IsKeyPressed(sf::Keyboard::Left),sf::Keyboard::IsKeyPressed(sf::Keyboard::Right));
-    if(sf::Keyboard::IsKeyPressed(sf::Keyboard::Z))m_playerOne->Switch();
+    //    const sf::Input &Input =m_gameEngine->m_app.GetInput();
+    //
+    //    //! Control du joueur 1
+    //    if(Input.IsKeyDown(sf::Key::L))m_playerOne->Degat(-40);
+    //    if(Input.IsKeyDown(sf::Key::X))m_playerOne->Jump();
+    //    if(Input.IsKeyDown(sf::Key::Z))m_playerOne->Shoot();
+    //    m_playerOne->TurnUp(Input.IsKeyDown(sf::Key::Up));
+    //    m_playerOne->Turn(Input.IsKeyDown(sf::Key::Left),Input.IsKeyDown(sf::Key::Right));
 
 
-//    const sf::Input &Input =m_gameEngine->m_app.GetInput();
-//
-//    //! Control du joueur 1
-//    if(Input.IsKeyDown(sf::Key::L))m_playerOne->Degat(-40);
-//    if(Input.IsKeyDown(sf::Key::X))m_playerOne->Jump();
-//    if(Input.IsKeyDown(sf::Key::Z))m_playerOne->Shoot();
-//    m_playerOne->TurnUp(Input.IsKeyDown(sf::Key::Up));
-//    m_playerOne->Turn(Input.IsKeyDown(sf::Key::Left),Input.IsKeyDown(sf::Key::Right));
+        /**
+            Gestion des personnages et objets
+        */
+
+     //! Déplacement du personnage 1
+        movePlayer(*m_playerOne);
+
+     //! Déplacement de la caméra
+        //m_camera.SetCenter(0.04*m_gameEngine->m_app.GetFrameTime()+m_camera.GetCenter().x, m_playerOne->GetPosition().y);
+        m_camera.SetCenter(m_playerOne->GetPosition());
+        m_gameEngine->m_app.SetView(m_camera);
+
+     //! Déplacement des objets
+        moveObject();
+         //! Déplacement du dragon
+         if(m_draMovX && m_dMovX>0)m_draMovX=false;
+         if(!m_draMovX && m_dMovX<-20.f)m_draMovX=true;
+
+         if(m_draMovX)m_dMovX+=0.03*m_gameEngine->m_app.GetFrameTime();
+         else m_dMovX-=0.03*m_gameEngine->m_app.GetFrameTime();
+
+         if(m_draMovY && m_dMovY>40)m_draMovY=false;
+         if(!m_draMovY && m_dMovY<20.f)m_draMovY=true;
+
+         if(m_draMovY)m_dMovY+=0.01*m_gameEngine->m_app.GetFrameTime();
+         else m_dMovY-=0.01*m_gameEngine->m_app.GetFrameTime();
+            m_dragon.SetPosition(m_dragon.GetPosition().x/**+m_dMovX*/+0.05*m_gameEngine->m_app.GetFrameTime(),
+                            m_gameEngine->m_app.GetView().GetCenter().y-m_gameEngine->m_app.GetView().GetSize().y/2+m_dMovY);
+
+    }
+    //! On met à jour les menus
+    m_levelInfo.SetPosition(m_gameEngine->m_app.GetView().GetCenter().x-m_gameEngine->m_app.GetView().GetSize().x/2+5,
+                        m_gameEngine->m_app.GetView().GetCenter().y-m_gameEngine->m_app.GetView().GetSize().y/2);
+    stringstream ss;
+    ss<<m_level;
+    string text="Level - "+ ss.str();
+    m_levelInfo.SetString(text);
+    m_levelInfo.SetScale(0.25,0.25);
+    m_levelInfo.SetCharacterSize(48);
 
 
-    /**
-        Gestion des personnages et objets
-    */
+    m_road.SetPosition(m_gameEngine->m_app.GetView().GetCenter().x,
+                        m_gameEngine->m_app.GetView().GetCenter().y+m_gameEngine->m_app.GetView().GetSize().y/2-20);
 
- //! Déplacement du personnage 1
-    movePlayer(*m_playerOne);
+    m_arrowDragon.SetPosition(m_gameEngine->m_app.GetView().GetCenter().x+2-GameConfig::g_imgManag["road"].img.GetWidth()/2+(m_dragon.GetPosition().x/GameConfig::g_config["tilewidth"])/m_map->m_width*100,
+                        m_gameEngine->m_app.GetView().GetCenter().y+m_gameEngine->m_app.GetView().GetSize().y/2-20);
 
- //! Déplacement de la caméra
-    m_camera.SetCenter(0.05*m_gameEngine->m_app.GetFrameTime()+m_camera.GetCenter().x, m_playerOne->GetPosition().y);
-    m_gameEngine->m_app.SetView(m_camera);
+    m_arrow.SetPosition(m_gameEngine->m_app.GetView().GetCenter().x+2-GameConfig::g_imgManag["road"].img.GetWidth()/2+(m_playerOne->GetPosition().x/GameConfig::g_config["tilewidth"])/m_map->m_width*100,
+                        m_gameEngine->m_app.GetView().GetCenter().y+m_gameEngine->m_app.GetView().GetSize().y/2-20);
 
- //! Déplacement des objets
-    moveObject();
- //! Déplacement du dragon
- if(m_draMovX && m_dMovX>0)m_draMovX=false;
- if(!m_draMovX && m_dMovX<-20.f)m_draMovX=true;
+    m_escape.SetPosition(m_gameEngine->m_app.GetView().GetCenter());
 
- if(m_draMovX)m_dMovX+=0.03*m_gameEngine->m_app.GetFrameTime();
- else m_dMovX-=0.03*m_gameEngine->m_app.GetFrameTime();
 
- if(m_draMovY && m_dMovY>40)m_draMovY=false;
- if(!m_draMovY && m_dMovY<20.f)m_draMovY=true;
-
- if(m_draMovY)m_dMovY+=0.01*m_gameEngine->m_app.GetFrameTime();
- else m_dMovY-=0.01*m_gameEngine->m_app.GetFrameTime();
-    m_dragon.SetPosition(m_gameEngine->m_app.GetView().GetCenter().x-m_gameEngine->m_app.GetView().GetSize().x/2+m_dMovX,
-                        m_gameEngine->m_app.GetView().GetCenter().y-m_gameEngine->m_app.GetView().GetSize().y/2+m_dMovY);
+    m_fade.SetPosition(m_gameEngine->m_app.GetView().GetCenter().x-m_gameEngine->m_app.GetView().GetSize().x/2,
+                        m_gameEngine->m_app.GetView().GetCenter().y-m_gameEngine->m_app.GetView().GetSize().y/2);
 }
 /**
     Pause le jeu
@@ -136,6 +250,16 @@ void PlayState::GetEvents(sf::Event){
 void PlayState::draw(){
     m_map->Draw();
     m_gameEngine->m_app.Draw(m_dragon);
+    m_gameEngine->m_app.Draw(m_levelInfo);
+    m_gameEngine->m_app.Draw(m_road);
+    m_gameEngine->m_app.Draw(m_arrowDragon);
+    m_gameEngine->m_app.Draw(m_arrow);
+
+    if(m_dead)m_gameEngine->m_app.Draw(m_fade);
+
+    if(m_end)m_gameEngine->m_app.Draw(m_escape);
+
+
 }
 
 /**
@@ -181,14 +305,11 @@ void PlayState::movePlayer(Player &player){
 
     //! Ouch!
     if(kill){
-        for(int y=0;y<m_map->m_height;y++){
-            for(int x=0;x<m_map->m_width;x++){
-                m_map->m_tileSet.at(x).at(y).tile.SetColor(sf::Color::White);
-                m_map->m_tileSet.at(x).at(y).touch=false;
-            }
-        }
-        player.SetPosition(m_map->m_spawnLocationOne);
-        m_camera=sf::View(m_playerOne->GetViewRect());
+        m_transitionDead.Reset();
+        m_fade.SetColor(sf::Color(255,255,255,1));
+        m_deadSound.Play();
+        m_dead=true;
+        m_fadeIn=true;
     }
 }
 
@@ -202,13 +323,18 @@ void PlayState::moveObject(){
             sf::FloatRect Rect=m_mapEntity->at(i)->GetMovedRect(m_mapEntity->at(i)->GetVelx()*m_gameEngine->m_app.GetFrameTime()/1000.f,m_mapEntity->at(i)->GetVely()*m_gameEngine->m_app.GetFrameTime()/1000.f);
             //! On vérifie si l'object touche le joueur si oui on supprimer l'objet et crée un animation d'un explosion
             if((m_playerOne->GetPlayerRect().Intersects(Rect))){
+                if(m_mapEntity->at(i)->collisionEffect(*m_playerOne)){
+                    m_map->m_spawnLocationOne=m_mapEntity->at(i)->GetPosition();
+                    m_checkpoint.Play();
+                }
+                else{
+                    m_coin.Play();
+                }
                 //! On crée libère la mémoire de le l'instance de l'objet
-                if(m_mapEntity->at(i)->collisionEffect(*m_playerOne))m_map->m_spawnLocationOne=m_mapEntity->at(i)->GetPosition();
                 delete m_mapEntity->at(i);
                 //! On supprime le pointeur du tableau dynamique
                 m_mapEntity->erase(m_mapEntity->begin()+i);
-                if(m_playerOne->IsPrincess())m_scoreP+=10;
-                else m_scoreK+=10;
+                m_score++;
             }
         }
         else{

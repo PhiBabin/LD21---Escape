@@ -23,6 +23,7 @@ ImgAnim::ImgAnim(GameConfig::g_imgManag["player"].img,GameConfig::g_imgManag["pl
 m_jumpLock(false),m_colBot(false),m_direction(false),m_moving(false),m_princess(false)
 {
    pause();
+    m_jump.SetBuffer(GameConfig::g_soundManag["jump"]);
 }
 
 sf::FloatRect Player::GetPlayerRect(){
@@ -43,6 +44,7 @@ void Player::Jump(){
         m_jumpLock=true;
         m_vely+=GameConfig::g_config["jump"];
         SetBottomCollision(false);
+        m_jump.Play();
     }
 }
 void Player::Turn(bool left, bool right){
